@@ -41,3 +41,23 @@ export async function requestCurrentLocation(): Promise<LocationResult> {
     };
   }
 }
+
+/**
+ * Converte um endereço em coordenadas com o geocodificador do próprio aparelho
+ * (sem chave de API). Usado para a origem "casa" ou "escola" da busca.
+ */
+export async function geocodeAddress(query: string): Promise<LocationResult> {
+  try {
+    const permission = await Location.requestForegroundPermissionsAsync();
+    if (permission.status !== Location.PermissionStatus.GRANTED) {
+      return { ok: false, reason: "denied", message: "Permita a localização para buscar a partir desse endereço." };
+    }
+    const [first] = await Location.geocodeAsync(query);
+    if (!first) {
+      return { ok: false, reason: "unavailable", message: "Não encontramos esse endereço no mapa. Confira os dados no seu perfil." };
+    }
+    return { ok: true, coordinates: { latitude: first.latitude, longitude: first.longitude } };
+  } catch {
+    return { ok: false, reason: "unavailable", message: "Não foi possível localizar esse endereço agora. Tente novamente." };
+  }
+}

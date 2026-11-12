@@ -13,22 +13,21 @@ import type { ReactNode } from "react";
 import { env } from "../config/env";
 import { demoPendingReviews, demoProfiles } from "../data/seed";
 import type { Profile, UserRole } from "../domain/models";
-import type { GeoCoordinates } from "../domain/location";
 import { isRoleAlreadyClaimedError } from "../utils/errors";
 import * as auth from "../services/authService";
 import * as api from "../services/dataService";
-import { requestCurrentLocation } from "../services/locationService";
 import { hasSeenOnboarding, markOnboardingSeen } from "../services/preferencesService";
 import { listFiles, uploadFile } from "../services/storageService";
 import { accountDocumentPath, uploadedAccountDocuments } from "../domain/documents";
 import type { AccountDocumentKey } from "../domain/documents";
-import { demoData, emptyData, emptyReviews, Result } from "./types";
+import { demoData, emptyData, emptyReviews } from "./types";
 import { useStoreCore } from "./core";
 import { createDonationActions } from "./donationActions";
 import { createRequestActions } from "./requestActions";
 import { createStockActions } from "./stockActions";
 import { createReviewActions } from "./reviewActions";
 import { createAccountActions } from "./accountActions";
+import { createLocationActions } from "./locationActions";
 
 export type { Result } from "./types";
 
@@ -150,26 +149,12 @@ function useAppStoreState() {
     setLocationMessage(null);
   };
 
-  const requestUserLocation = async (): Promise<Result<GeoCoordinates>> => {
-    setLocationStatus("loading");
-    setLocationMessage(null);
-    const result = await requestCurrentLocation();
-    if (!result.ok) {
-      setUserLocation(null);
-      setLocationStatus(result.reason);
-      setLocationMessage(result.message);
-      return { ok: false, error: result.message };
-    }
-    setUserLocation(result.coordinates);
-    setLocationStatus("granted");
-    return { ok: true, value: result.coordinates };
-  };
-
   const { createDonation, reviewDonation } = createDonationActions(core);
   const { createRequest, cancelRequest, regeneratePickupCode, advanceRequest, confirmDelivery } = createRequestActions(core);
   const { registerMovement } = createStockActions(core);
   const { loadReviews, reviewEnrollment, reviewCollector, openReviewDocument } = createReviewActions(core);
   const { openTicket, markAllRead, updateSettings, updateProfile, saveEnrollment } = createAccountActions(core);
+  const { requestUserLocation, locateSearchOrigin, canUseOrigin } = createLocationActions(core);
 
   return {
     mode,
@@ -217,6 +202,8 @@ function useAppStoreState() {
     markAllRead,
     updateSettings,
     requestUserLocation,
+    locateSearchOrigin,
+    canUseOrigin,
     updateProfile,
     saveEnrollment,
     reviews,

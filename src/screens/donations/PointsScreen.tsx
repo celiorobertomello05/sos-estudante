@@ -1,150 +1,119 @@
 import { useMemo, useState } from "react";
-import { Linking, Platform, Pressable, View } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import Photo from "../../components/Photo";
+import { Platform } from "react-native";
 import PointsMap from "../../components/PointsMap";
 import Screen from "../../components/Screen";
-import { Button, Card, Chips, EmptyState, Field, Notice, Pill, ProgressBar, Row, Txt } from "../../components/ui";
-import { distanceBetweenCoordinatesKm } from "../../domain/location";
-import type { CollectionPoint } from "../../domain/models";
+import { Button, Chips, EmptyState, Field, Notice, Txt } from "../../components/ui";
+import type { GeoCoordinates } from "../../domain/location";
+import {
+  DEFAULT_RADIUS_KM,
+  RADIUS_OPTIONS_KM,
+  emptyRadiusMessage,
+  originLabels,
+  pointsWithinRadius,
+  type SearchOrigin,
+} from "../../domain/pointSearch";
 import { useApp } from "../../store/AppStore";
-import { colors, spacing } from "../../theme";
-import { styles } from "./styles";
+import { PointCard } from "./PointCard";
 
 type PointFilter = "near" | "open" | "capacity";
+const ORIGINS: SearchOrigin[] = ["current", "home", "school"];
 
-function openDirections(point: CollectionPoint) {
-  const label = encodeURIComponent(point.name);
-  const url =
-    Platform.OS === "ios"
-      ? `maps:0,0?q=${label}@${point.latitude},${point.longitude}`
-      : `geo:${point.latitude},${point.longitude}?q=${point.latitude},${point.longitude}(${label})`;
-  Linking.openURL(url).catch(() =>
-    Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${point.latitude},${point.longitude}`),
-  );
-}
-
+/** Locais de retirada: busca por raio a partir de onde estou, da casa ou da escola (US01). */
 export function PointsScreen() {
   const app = useApp();
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<PointFilter>("near");
-  const showDistance = app.settings.shareLocation && app.userLocation !== null;
-  const distances = useMemo(() => {
-    const currentLocation = app.userLocation;
-    if (!currentLocation) return new Map<string, number>();
-    return new Map(
-      app.points.map((point) => [
-        point.id,
-        distanceBetweenCoordinatesKm(currentLocation, point),
-      ]),
-    );
-  }, [app.points, app.userLocation]);
+  const [radius, setRadius] = useState<number>(DEFAULT_RADIUS_KM);
+  const restored = app.settings.shareLocation && app.userLocation ? app.userLocation : null;
+  const [origin, setOrigin] = useState<SearchOrigin | "none">(restored ? "current" : "none");
+  const [coords, setCoords] = useState<GeoCoordinates | null>(restored);
+  const [originError, setOriginError] = useState<string | null>(null);
+  const isWeb = Platform.OS === "web";
 
-  const points = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    const list = app.points.filter((p) => !q || `${p.name} ${p.district} ${p.address}`.toLowerCase().includes(q));
-    if (filter === "open") return list.filter((p) => p.openNow);
-    if (filter === "capacity") return [...list].sort((a, b) => b.capacity - a.capacity);
-    return showDistance
-      ? [...list].sort((a, b) => (distances.get(a.id) ?? Infinity) - (distances.get(b.id) ?? Infinity))
-      : [...list].sort((a, b) => a.name.localeCompare(b.name));
-  }, [app.points, query, filter, showDistance, distances]);
-
-  const requestLocation = async () => {
-    const result = await app.requestUserLocation();
-    if (result.ok && !app.settings.shareLocation) {
-      await app.updateSettings({ shareLocation: true });
-    }
+  const chooseOrigin = async (next: SearchOrigin | "none") => {
+    if (next === "none") return;
+    setOriginError(null);
+    const result = await app.locateSearchOrigin(next);
+    if (!result.ok || !result.value) return setOriginError(result.error ?? null);
+    setOrigin(next);
+    setCoords(result.value);
+    if (next === "current" && !app.settings.shareLocation) await app.updateSettings({ shareLocation: true });
   };
+
+  const byText = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return app.points.filter((p) => !q || `${p.name} ${p.district} ${p.address}`.toLowerCase().includes(q));
+  }, [app.points, query]);
+
+  const results = useMemo(() => {
+    const base = coords
+      ? pointsWithinRadius(byText, coords, radius)
+      : [...byText].sort((a, b) => a.name.localeCompare(b.name)).map((point) => ({ point, distanceKm: undefined as number | undefined }));
+    if (filter === "open") return base.filter((r) => r.point.openNow);
+    if (filter === "capacity") return [...base].sort((a, b) => b.point.capacity - a.point.capacity);
+    return base;
+  }, [byText, coords, radius, filter]);
+
+  const empty = coords && origin !== "none" && results.length === 0 && byText.length > 0 ? emptyRadiusMessage(byText, coords, radius, origin) : null;
 
   return (
     <Screen tabs title="Locais de retirada">
       {app.points.length ? (
-        <PointsMap
-          caption={`${app.points.length} pontos de coleta ativos`}
-          points={app.points}
-          userLocation={showDistance ? app.userLocation ?? undefined : undefined}
-        />
+        <PointsMap caption={`${app.points.length} pontos de coleta ativos`} points={app.points} userLocation={coords ?? undefined} />
       ) : null}
-      {Platform.OS === "web" ? (
-        <Notice
-          body="O preview mantém o mapa visual. A posição atual fica disponível no aplicativo Android e iOS."
-          title="Visualização web"
-        />
+      {isWeb ? (
+        <Notice body="A busca por distância (onde estou, casa ou escola) funciona no aplicativo Android e iOS." title="Visualização web" />
       ) : (
-        <Button
-          icon="locate-outline"
-          label={showDistance ? "Atualizar minha localização" : "Usar minha localização"}
-          loading={app.locationStatus === "loading"}
-          onPress={requestLocation}
-          variant="secondary"
-        />
+        <>
+          <Txt variant="label">Buscar a partir de</Txt>
+          <Chips
+            onChange={chooseOrigin}
+            options={ORIGINS.filter((o) => app.canUseOrigin(o)).map((o) => ({ value: o, label: originLabels[o].option }))}
+            value={origin}
+          />
+          {coords ? (
+            <>
+              <Txt variant="label">Raio de busca</Txt>
+              <Chips
+                onChange={(v) => setRadius(Number(v))}
+                options={RADIUS_OPTIONS_KM.map((km) => ({ value: String(km), label: `${km} km` }))}
+                value={String(radius)}
+              />
+            </>
+          ) : null}
+          {app.locationStatus === "loading" ? <Txt variant="small">Localizando…</Txt> : null}
+          {originError ? <Notice body={originError} title="Não foi possível usar essa origem" tone="amber" /> : null}
+          {!coords && !originError ? (
+            <Notice body="Escolha onde estou, casa ou escola para ver os pontos dentro do raio de busca." title="Encontre o ponto mais perto" />
+          ) : null}
+        </>
       )}
-      {app.locationMessage ? (
-        <Notice body={app.locationMessage} title={app.locationStatus === "denied" ? "Permissão não concedida" : "Localização indisponível"} />
-      ) : null}
       <Field label="Buscar" onChangeText={setQuery} placeholder="Nome ou bairro" value={query} />
       <Chips
         onChange={setFilter}
         options={[
-          { value: "near", label: showDistance ? "Mais próximo" : "Ordem alfabética" },
+          { value: "near", label: coords ? "Mais próximo" : "Ordem alfabética" },
           { value: "open", label: "Aberto agora" },
           { value: "capacity", label: "Maior capacidade" },
         ]}
         value={filter}
       />
-      {!showDistance && Platform.OS !== "web" && !app.locationMessage ? (
-        <Notice body="Use o botão acima para autorizar a localização e calcular as distâncias reais." title="Localização opcional" />
+      {coords && origin !== "none" && results.length > 0 ? (
+        <Txt variant="small">
+          {results.length} {results.length === 1 ? "ponto" : "pontos"} até {radius} km {originLabels[origin].phrase}
+        </Txt>
       ) : null}
-      {points.length === 0 ? <EmptyState body="Tente outro nome, bairro ou filtro." icon="search-outline" title="Nenhum ponto encontrado" /> : null}
-      {points.map((point) => (
-        <Card key={point.id} padded={false}>
-          <View style={{ gap: spacing.md, padding: spacing.lg }}>
-            <Row style={{ alignItems: "flex-start" }}>
-              <Photo imageKey={point.imageKey} style={styles.pointImage} />
-              <View style={{ flex: 1 }}>
-                <Txt variant="title">{point.name}</Txt>
-                <Txt variant="small">
-                  {point.address} — {point.district}
-                </Txt>
-              </View>
-              <Pill label={point.openNow ? "Aberto" : "Fechado"} tone={point.openNow ? "brand" : "neutral"} />
-            </Row>
-            <Row gap={spacing.md}>
-              {showDistance && distances.has(point.id) ? (
-                <Txt variant="small">
-                  {distances.get(point.id)!.toLocaleString("pt-BR", { maximumFractionDigits: 1 })} km
-                </Txt>
-              ) : null}
-              <Txt variant="small">{point.hours}</Txt>
-              <Row gap={2}>
-                <Ionicons color={colors.amber500} name="star" size={12} />
-                <Txt variant="small" color={colors.amber500}>
-                  {point.rating.toLocaleString("pt-BR")}
-                </Txt>
-              </Row>
-            </Row>
-            <Row style={{ justifyContent: "space-between" }}>
-              <Txt variant="small">Capacidade disponível</Txt>
-              <Txt variant="label">{point.capacity}%</Txt>
-            </Row>
-            <ProgressBar tone={point.capacity < 50 ? "amber" : "brand"} value={point.capacity} />
-          </View>
-          <View style={styles.pointActions}>
-            <Row gap={6} style={{ flex: 1, justifyContent: "center", paddingVertical: 12 }}>
-              <Ionicons color={point.openNow ? colors.brand700 : colors.ink400} name={point.openNow ? "checkmark" : "time-outline"} size={16} />
-              <Txt variant="label" color={point.openNow ? colors.brand700 : colors.ink500}>
-                {point.openNow ? "Atendimento disponível" : "Fora do horário"}
-              </Txt>
-            </Row>
-            <Pressable accessibilityRole="button" onPress={() => openDirections(point)} style={styles.directions}>
-              <Ionicons color={colors.trust600} name="navigate-outline" size={16} />
-              <Txt variant="label" color={colors.trust600}>
-                Como chegar
-              </Txt>
-            </Pressable>
-          </View>
-        </Card>
+      {empty ? (
+        <EmptyState
+          action={empty.suggestedRadiusKm ? <Button label={`Ampliar para ${empty.suggestedRadiusKm} km`} onPress={() => setRadius(empty.suggestedRadiusKm!)} /> : undefined}
+          body={empty.body}
+          icon="locate-outline"
+          title={empty.title}
+        />
+      ) : null}
+      {!empty && results.length === 0 ? <EmptyState body="Tente outro nome, bairro ou filtro." icon="search-outline" title="Nenhum ponto encontrado" /> : null}
+      {results.map(({ point, distanceKm }) => (
+        <PointCard distanceKm={distanceKm} key={point.id} point={point} />
       ))}
     </Screen>
   );
