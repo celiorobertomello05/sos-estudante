@@ -10,3 +10,11 @@ export async function requestCurrentLocation(): Promise<LocationResult> {
     message: "A localização do aparelho está disponível no aplicativo para Android e iOS.",
   };
 }
+
+export async function geocodeAddress(_query: string): Promise<LocationResult> {
+  return {
+    ok: false,
+    reason: "unavailable",
+    message: "A busca a partir da casa ou da escola está disponível no aplicativo para Android e iOS.",
+  };
+}

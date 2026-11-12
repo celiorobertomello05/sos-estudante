@@ -13,6 +13,7 @@ const pureModules = [
   "src/domain/catalog.ts",
   "src/domain/labels.ts",
   "src/domain/location.ts",
+  "src/domain/pointSearch.ts",
   "src/domain/models.ts",
   "src/domain/rules.ts",
   "src/domain/requestRules.ts",
@@ -53,6 +54,7 @@ const schedule = require(path.join(compiledRoot, "src/domain/schedule.js"));
 const documents = require(path.join(compiledRoot, "src/domain/documents.js"));
 const catalog = require(path.join(compiledRoot, "src/domain/catalog.js"));
 const location = require(path.join(compiledRoot, "src/domain/location.js"));
+const pointSearch = require(path.join(compiledRoot, "src/domain/pointSearch.js"));
 const models = require(path.join(compiledRoot, "src/domain/models.js"));
 const statistics = require(path.join(compiledRoot, "src/domain/statistics.js"));
 const seed = require(path.join(compiledRoot, "src/data/seed.js"));
@@ -1160,4 +1162,37 @@ test("Expo Go: retorno do login usa exp:// (sosestudante:// só no app instalado
   assert.equal(authLinks.expoGoRedirectUrl(null, "auth/callback"), null);
   // O link que volta pelo Expo Go continua sendo reconhecido.
   assert.deepEqual(authLinks.parseAuthLink("exp://192.168.0.5:8081/--/auth/callback?code=abc"), { kind: "callback", code: "abc" });
+});
+
+test("busca por raio: só pontos dentro do raio, do mais perto para o mais longe (CA01)", () => {
+  const casa = { latitude: -23.5505, longitude: -46.6333 };
+  const perto = { id: "a", latitude: -23.5415, longitude: -46.6333 }; // ~1 km
+  const medio = { id: "b", latitude: -23.5235, longitude: -46.6333 }; // ~3 km
+  const longe = { id: "c", latitude: -23.4605, longitude: -46.6333 }; // ~10 km
+  const r = pointSearch.pointsWithinRadius([longe, medio, perto], casa, 5);
+  assert.deepEqual(r.map((x) => x.point.id), ["a", "b"]);
+  assert.ok(r[0].distanceKm < r[1].distanceKm);
+  assert.deepEqual(pointSearch.pointsWithinRadius([longe], casa, 20).map((x) => x.point.id), ["c"]);
+  assert.equal(pointSearch.DEFAULT_RADIUS_KM, 5);
+});
+
+test("sem resultados no raio: sugere expandir para o raio que alcança o ponto mais próximo (CA02)", () => {
+  const casa = { latitude: -23.5505, longitude: -46.6333 };
+  const longe = { latitude: -23.4605, longitude: -46.6333 }; // ~10 km
+  const m = pointSearch.emptyRadiusMessage([longe], casa, 2, "home");
+  assert.equal(m.title, "Nenhum ponto até 2 km da sua casa");
+  assert.equal(m.suggestedRadiusKm, 20);
+  assert.match(m.body, /Amplie a busca para 20 km/);
+  assert.equal(pointSearch.nextRadiusKm(5), 10);
+  assert.equal(pointSearch.nextRadiusKm(20), null);
+  const nada = pointSearch.emptyRadiusMessage([{ latitude: -22.9, longitude: -43.2 }], casa, 20, "school");
+  assert.equal(nada.suggestedRadiusKm, null);
+  assert.match(nada.title, /da sua escola/);
+});
+
+test("origem casa/escola: monta o endereço para o geocodificador do aparelho", () => {
+  assert.equal(pointSearch.homeGeocodeQuery("Rua das Palmeiras, 88", "02145010"), "Rua das Palmeiras, 88, 02145-010, Brasil");
+  assert.equal(pointSearch.homeGeocodeQuery("  ", "02145010"), null);
+  assert.equal(pointSearch.schoolGeocodeQuery("EMEF João Paulo II", "0214"), "EMEF João Paulo II, Brasil");
+  assert.equal(pointSearch.schoolGeocodeQuery(undefined, "02145010"), null);
 });

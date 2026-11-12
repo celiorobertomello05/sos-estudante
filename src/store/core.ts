@@ -27,6 +27,8 @@ export function useStoreCore() {
   const [userLocation, setUserLocation] = useState<GeoCoordinates | null>(null);
   const [locationStatus, setLocationStatus] = useState<LocationStatus>("idle");
   const [locationMessage, setLocationMessage] = useState<string | null>(null);
+  /** Coordenadas de casa/escola já localizadas, por endereço (evita geocodificar de novo). */
+  const [originCache, setOriginCache] = useState<Record<string, GeoCoordinates>>({});
   /** Pendências de revisão da equipe; carregadas sob demanda pela tela. */
   const [reviews, setReviews] = useState<PendingReviews>(emptyReviews);
   /** Sessão aberta pelo link "redefinir senha": o app pede a nova senha. */
@@ -165,7 +167,7 @@ export function useStoreCore() {
     if (notice) throw new Error(`BUSINESS_RULE: ${notice.body}`);
   };
 
-  return { mode, setMode, booting, setBooting, startupError, setStartupError, profile, setProfile, data, setData, settings, setSettings, userLocation, setUserLocation, locationStatus, setLocationStatus, locationMessage, setLocationMessage, reviews, setReviews, passwordRecovery, setPasswordRecovery, googleEnabled, setGoogleEnabled, signupProvider, setSignupProvider, accountDocuments, setAccountDocuments, authLinkNotice, setAuthLinkNotice, connecting, withConnecting, patch, run, pushLocalNotification, refresh, isDemo, ensureActiveAccount };
+  return { mode, setMode, booting, setBooting, startupError, setStartupError, profile, setProfile, data, setData, settings, setSettings, userLocation, setUserLocation, locationStatus, setLocationStatus, locationMessage, setLocationMessage, originCache, setOriginCache, reviews, setReviews, passwordRecovery, setPasswordRecovery, googleEnabled, setGoogleEnabled, signupProvider, setSignupProvider, accountDocuments, setAccountDocuments, authLinkNotice, setAuthLinkNotice, connecting, withConnecting, patch, run, pushLocalNotification, refresh, isDemo, ensureActiveAccount };
 }
 
 export type StoreCore = ReturnType<typeof useStoreCore>;
