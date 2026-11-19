@@ -12,7 +12,7 @@ import { canAccess, publicRoutes } from "../navigation/routes";
 import type { Route } from "../navigation/routes";
 import { AppStoreProvider, useApp } from "../store/AppStore";
 import { colors } from "../theme";
-import { AdminDashboardScreen, AdminStockScreen, ImpactMapScreen } from "../screens/admin/AdminScreens";
+import { AdminDashboardScreen, AdminStockScreen, ImpactMapScreen, PointFormScreen } from "../screens/admin/AdminScreens";
 import { ReviewsScreen } from "../screens/admin/ReviewScreens";
 import {
   AboutScreen,
@@ -68,6 +68,7 @@ const screens: Record<Route["name"], () => ReactNode> = {
   about: AboutScreen,
   admin: AdminDashboardScreen,
   "admin-stock": AdminStockScreen,
+  "point-new": PointFormScreen,
   "impact-map": ImpactMapScreen,
   reviews: ReviewsScreen,
 };

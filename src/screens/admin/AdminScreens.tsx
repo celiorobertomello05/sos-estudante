@@ -2,3 +2,4 @@
 export { AdminDashboardScreen } from "./AdminDashboardScreen";
 export { AdminStockScreen } from "./AdminStockScreen";
 export { ImpactMapScreen } from "./ImpactMapScreen";
+export { PointFormScreen } from "./PointFormScreen";

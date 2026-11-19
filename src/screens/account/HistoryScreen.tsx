@@ -29,7 +29,7 @@ export function HistoryScreen() {
   const app = useApp();
   const { go } = useNav();
   const { role } = useProfile();
-  const [tab, setTab] = useState<"done" | "all">("done");
+  const [tab, setTab] = useState<"done" | "all" | "activity">("done");
   const pointName = (id: string) => app.points.find((p) => p.id === id)?.name ?? "";
 
   let entries: HistoryEntry[] = [];
@@ -51,24 +51,37 @@ export function HistoryScreen() {
     headline = `${app.deliveries.length + app.requests.filter((r) => r.status === "delivered").length} entregas registradas`;
   }
 
-  const tabLabels = role === "student" ? ["Recebidos", "Solicitações"] : role === "donor" ? ["Aprovadas", "Todas"] : ["Entregas", "Movimentações"];
+  if (tab === "activity") {
+    // Linha do tempo única: avisos recebidos + ações do próprio usuário, da mais recente para a mais antiga.
+    const notices: HistoryEntry[] = app.notifications.map((n) => ({ id: `n-${n.id}`, title: n.title, detail: n.body, date: n.createdAt, icon: "notifications-outline", tone: n.kind === "success" ? "brand" : "trust", done: n.read }));
+    const own: HistoryEntry[] =
+      role === "student"
+        ? app.requests.map((r) => ({ id: `r-${r.id}`, title: `Pedido: ${itemsSummary(r.items)}`, detail: `Retirada no ${pointName(r.pointId)}`, date: r.pickupAt, icon: categoryIcons[r.items[0]?.category ?? "kit"], tone: "brand", done: r.status === "delivered" }))
+        : role === "donor"
+          ? app.donations.map((d) => ({ id: `d-${d.id}`, title: `Doação: ${d.quantity}× ${categoryLabels[d.category]} — Tam. ${d.size}`, detail: `Protocolo ${d.protocol} · ${pointName(d.pointId)}`, date: d.createdAt, icon: categoryIcons[d.category], tone: "trust", done: d.status === "stocked" || d.status === "approved" }))
+          : app.movements.map((m) => ({ id: `m-${m.id}`, title: `${movementMeta[m.type].label} · ${m.label}`, detail: `${m.from} → ${m.to} · ${m.responsible}`, date: m.createdAt, icon: "swap-horizontal-outline", tone: movementMeta[m.type].tone, done: true }));
+    entries = [...notices, ...own].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    headline = `${entries.length} ${entries.length === 1 ? "registro" : "registros"} de atividade na sua conta`;
+  }
+
+  const tabLabels = role === "student" ? ["Recebidos", "Solicitações", "Atividade"] : role === "donor" ? ["Aprovadas", "Todas", "Atividade"] : ["Entregas", "Movimentações", "Atividade"];
 
   return (
-    <Screen tabs title={role === "student" ? "Seus pedidos" : "Histórico"}>
+    <Screen tabs title="Histórico de atividades">
       <LinearGradient colors={[colors.brand800, colors.brand600]} end={{ x: 1, y: 0 }} start={{ x: 0, y: 0 }} style={styles.historyHero}>
         <View style={styles.historyIcon}>
           <Ionicons color={colors.white} name="cube-outline" size={20} />
         </View>
         <View style={{ flex: 1 }}>
           <Txt variant="title" color={colors.white}>
-            {role === "donor" ? "Suas doações" : role === "student" ? "Itens que você recebeu" : "Sua operação"}
+            {tab === "activity" ? "Atividade da sua conta" : role === "donor" ? "Suas doações" : role === "student" ? "Itens que você recebeu" : "Sua operação"}
           </Txt>
           <Txt variant="small" color="rgba(255,255,255,0.8)">
             {headline}
           </Txt>
         </View>
       </LinearGradient>
-      <Tabs onChange={setTab} options={[{ value: "done", label: tabLabels[0] }, { value: "all", label: tabLabels[1] }]} value={tab} />
+      <Tabs onChange={setTab} options={[{ value: "done", label: tabLabels[0] }, { value: "all", label: tabLabels[1] }, { value: "activity", label: tabLabels[2] }]} value={tab} />
       {entries.length === 0 ? <EmptyState body="Quando houver atividade, ela aparece aqui." icon="time-outline" title="Sem registros" /> : null}
       {entries.map((e) => (
         <Card key={e.id} onPress={role !== "donor" && tab === "all" && role === "student" ? () => go({ name: "request-detail", id: e.id }) : undefined}>

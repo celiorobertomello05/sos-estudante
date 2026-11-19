@@ -109,6 +109,7 @@ export function AdminDashboardScreen() {
       <ListRow detail={`${app.donations.filter((d) => isAwaitingTriage(d.status)).length} lotes aguardando`} icon="filter-outline" onPress={() => go({ name: "triage" })} title="Triagem" tone="amber" />
       <ListRow detail="Matrículas com CadÚnico e cadastros de coletores" icon="shield-checkmark-outline" onPress={() => go({ name: "reviews" })} title="Validações" tone="purple" />
       <ListRow detail="Entradas, saídas e transferências" icon="swap-horizontal-outline" onPress={() => go({ name: "admin-stock" })} title="Gestão de estoque" tone="brand" />
+      <ListRow detail="Cadastre novos locais de entrega e retirada" icon="add-circle-outline" onPress={() => go({ name: "point-new" })} title="Cadastrar ponto de coleta" tone="brand" />
       <ListRow detail="Pontos, escolas e regiões" icon="map-outline" onPress={() => go({ name: "impact-map" })} title="Mapa de impacto" tone="trust" />
     </Screen>
   );

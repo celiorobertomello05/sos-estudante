@@ -14,6 +14,7 @@ const pureModules = [
   "src/domain/labels.ts",
   "src/domain/location.ts",
   "src/domain/pointSearch.ts",
+  "src/domain/pointRegistration.ts",
   "src/domain/models.ts",
   "src/domain/rules.ts",
   "src/domain/requestRules.ts",
@@ -1195,4 +1196,19 @@ test("origem casa/escola: monta o endereço para o geocodificador do aparelho", 
   assert.equal(pointSearch.homeGeocodeQuery("  ", "02145010"), null);
   assert.equal(pointSearch.schoolGeocodeQuery("EMEF João Paulo II", "0214"), "EMEF João Paulo II, Brasil");
   assert.equal(pointSearch.schoolGeocodeQuery(undefined, "02145010"), null);
+});
+
+test("cadastro de ponto: valida tamanhos, capacidade e monta o endereço para o geocodificador", () => {
+  const pointRegistration = require(path.join(compiledRoot, "src/domain/pointRegistration.js"));
+  const ok = { name: "Escola Municipal Centro", address: "Rua das Flores, 100", district: "Centro", hours: "Seg a Sex, 9h às 17h", capacity: "40" };
+  assert.equal(pointRegistration.pointInputIssue(ok), null);
+  assert.match(pointRegistration.pointInputIssue({ ...ok, name: "ab" }), /Nome/);
+  assert.match(pointRegistration.pointInputIssue({ ...ok, address: "x" }), /Endereço/);
+  assert.match(pointRegistration.pointInputIssue({ ...ok, district: "" }), /Bairro/);
+  assert.match(pointRegistration.pointInputIssue({ ...ok, hours: "  " }), /Horário/);
+  assert.match(pointRegistration.pointInputIssue({ ...ok, capacity: "0" }), /Capacidade/);
+  assert.match(pointRegistration.pointInputIssue({ ...ok, capacity: "101" }), /Capacidade/);
+  assert.match(pointRegistration.pointInputIssue({ ...ok, capacity: "4a" }), /Capacidade/);
+  assert.equal(pointRegistration.cleanPointInput({ ...ok, name: "  Ponto   Um " }).name, "Ponto Um");
+  assert.equal(pointRegistration.pointGeocodeQuery({ address: " Rua das Flores,  100", district: "Centro" }), "Rua das Flores, 100, Centro, Brasil");
 });

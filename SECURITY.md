@@ -42,6 +42,10 @@ quem mantém o projeto.
   bloqueado após 5 erros.
 - Revisão pela equipe (matrículas e coletores) por RPC, sem autoaprovação; a
   equipe só lê documentos de quem tem revisão pendente.
+- Pontos de coleta: o cadastro é feito pela RPC `create_collection_point`,
+  restrita a coletor com conta ativa, com validação de tamanhos, capacidade,
+  coordenadas e duplicidade no servidor, e registro em `audit_logs`. Não há
+  INSERT direto na tabela; o aplicativo só lê.
 - Perfil: o usuário só altera nome, telefone, CEP, endereço e foto (permissão
   por coluna). Papel e CPF/RG são definidos uma única vez por RPC.
 - Ações sensíveis registradas em `audit_logs` (sem acesso pelo cliente).
