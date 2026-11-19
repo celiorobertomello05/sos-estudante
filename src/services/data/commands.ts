@@ -185,3 +185,29 @@ export async function reviewEnrollment(enrollmentId: string, decision: "verify" 
 export async function reviewCollector(profileId: string, decision: "approve" | "reject") {
   await unwrap(requireSupabase().rpc("review_collector", { p_profile_id: profileId, p_decision: decision }));
 }
+
+export async function createCollectionPoint(input: {
+  name: string;
+  address: string;
+  district: string;
+  hours: string;
+  capacity: number;
+  latitude: number;
+  longitude: number;
+}) {
+  await unwrap(
+    requireSupabase().rpc("create_collection_point", {
+      p_name: input.name,
+      p_address: input.address,
+      p_district: input.district,
+      p_hours: input.hours,
+      p_capacity: input.capacity,
+      p_latitude: input.latitude,
+      p_longitude: input.longitude,
+    }),
+  );
+}
+
+export async function expressInterest(needId: string) {
+  await unwrap(requireSupabase().rpc("express_interest", { p_need_id: needId }));
+}

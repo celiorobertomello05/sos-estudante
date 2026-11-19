@@ -12,6 +12,7 @@ import {
   pointsWithinRadius,
   type SearchOrigin,
 } from "../../domain/pointSearch";
+import { useNav } from "../../navigation/Navigator";
 import { useApp } from "../../store/AppStore";
 import { PointCard } from "./PointCard";
 
@@ -21,6 +22,7 @@ const ORIGINS: SearchOrigin[] = ["current", "home", "school"];
 /** Locais de retirada: busca por raio a partir de onde estou, da casa ou da escola (US01). */
 export function PointsScreen() {
   const app = useApp();
+  const { go } = useNav();
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<PointFilter>("near");
   const [radius, setRadius] = useState<number>(DEFAULT_RADIUS_KM);
@@ -58,6 +60,7 @@ export function PointsScreen() {
 
   return (
     <Screen tabs title="Locais de retirada">
+      {app.role === "collector" ? <Button icon="add-circle-outline" label="Cadastrar ponto de coleta" onPress={() => go({ name: "point-new" })} variant="ghost" /> : null}
       {app.points.length ? (
         <PointsMap caption={`${app.points.length} pontos de coleta ativos`} points={app.points} userLocation={coords ?? undefined} />
       ) : null}

@@ -12,7 +12,7 @@ import { canAccess, publicRoutes } from "../navigation/routes";
 import type { Route } from "../navigation/routes";
 import { AppStoreProvider, useApp } from "../store/AppStore";
 import { colors } from "../theme";
-import { AdminDashboardScreen, AdminStockScreen, ImpactMapScreen } from "../screens/admin/AdminScreens";
+import { AdminDashboardScreen, AdminStockScreen, ImpactMapScreen, PointFormScreen } from "../screens/admin/AdminScreens";
 import { ReviewsScreen } from "../screens/admin/ReviewScreens";
 import {
   AboutScreen,
@@ -30,6 +30,7 @@ import { CompleteProfileScreen, ForgotPasswordScreen, LoginScreen, NewPasswordSc
 import { DeliveryScreen, DistributionScreen } from "../screens/delivery/DeliveryScreens";
 import { DonateScreen, DonationSuccessScreen, PointsScreen } from "../screens/donations/DonationScreens";
 import DashboardScreen from "../screens/home/DashboardScreen";
+import { NeedDetailScreen, NeedSuccessScreen, NeedsScreen } from "../screens/needs/NeedScreens";
 import { StockDetailScreen, StockScreen, TriageScreen } from "../screens/inventory/InventoryScreens";
 import { RequestDetailScreen, RequestScreen, RequestSuccessScreen, RequestsScreen } from "../screens/requests/RequestScreens";
 
@@ -68,6 +69,10 @@ const screens: Record<Route["name"], () => ReactNode> = {
   about: AboutScreen,
   admin: AdminDashboardScreen,
   "admin-stock": AdminStockScreen,
+  "point-new": PointFormScreen,
+  needs: NeedsScreen,
+  "need-detail": NeedDetailScreen,
+  "need-success": NeedSuccessScreen,
   "impact-map": ImpactMapScreen,
   reviews: ReviewsScreen,
 };

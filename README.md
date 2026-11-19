@@ -17,9 +17,13 @@ uniformes e materiais escolares"**, apresentado no **4º Summit UMC**
 - **Estudante:** valida a matrícula (com CadÚnico), solicita itens e acompanha o
   pedido até a retirada com um código de 4 dígitos.
 - **Doador:** registra doações e agenda a entrega em pontos de coleta próximos
-  (mapa e localização).
+  (mapa e localização); vê as necessidades abertas, de forma anônima, e
+  demonstra interesse em ajudar (US05).
 - **Equipe:** triagem de doações, controle de estoque, aprovação de pedidos,
-  validação de matrículas e coletores, e entrega com foto e assinatura.
+  validação de matrículas e coletores, cadastro de pontos de coleta e entrega
+  com foto e assinatura.
+- **Mapa e ajuda:** mapa dos pontos que abre ampliado ao toque, Central de ajuda
+  com orientações de LGPD, histórico de atividades e tela Sobre.
 - **Conta:** login por e-mail ou Google (OAuth + PKCE), completar cadastro para
   quem entra pelo Google, recuperação de senha por link, documentos privados.
 - **Modo demonstração:** explora todos os fluxos sem banco de dados.
@@ -73,7 +77,8 @@ flag, o app mostra um erro de configuração em vez de entrar na demonstração.
 
 1. Crie um projeto no Supabase e aplique, em ordem, os arquivos de
    `supabase/migrations/`. Opcional: `supabase/seed.sql` para o catálogo de
-   exemplo.
+   exemplo (dados fictícios). Os pontos de coleta reais são cadastrados pela
+   equipe no app, em Painel › Cadastrar ponto de coleta.
 2. No `.env`, preencha `EXPO_PUBLIC_SUPABASE_URL` e a chave pública
    `EXPO_PUBLIC_SUPABASE_ANON_KEY` (nunca a `service_role`).
 3. Authentication → URL Configuration: adicione `sosestudante://auth/reset` e

@@ -14,6 +14,8 @@ const pureModules = [
   "src/domain/labels.ts",
   "src/domain/location.ts",
   "src/domain/pointSearch.ts",
+  "src/domain/pointRegistration.ts",
+  "src/domain/needs.ts",
   "src/domain/models.ts",
   "src/domain/rules.ts",
   "src/domain/requestRules.ts",
@@ -1195,4 +1197,39 @@ test("origem casa/escola: monta o endereço para o geocodificador do aparelho", 
   assert.equal(pointSearch.homeGeocodeQuery("  ", "02145010"), null);
   assert.equal(pointSearch.schoolGeocodeQuery("EMEF João Paulo II", "0214"), "EMEF João Paulo II, Brasil");
   assert.equal(pointSearch.schoolGeocodeQuery(undefined, "02145010"), null);
+});
+
+test("cadastro de ponto: valida tamanhos, capacidade e monta o endereço para o geocodificador", () => {
+  const pointRegistration = require(path.join(compiledRoot, "src/domain/pointRegistration.js"));
+  const ok = { name: "Escola Municipal Centro", address: "Rua das Flores, 100", district: "Centro", hours: "Seg a Sex, 9h às 17h", capacity: "40" };
+  assert.equal(pointRegistration.pointInputIssue(ok), null);
+  assert.match(pointRegistration.pointInputIssue({ ...ok, name: "ab" }), /Nome/);
+  assert.match(pointRegistration.pointInputIssue({ ...ok, address: "x" }), /Endereço/);
+  assert.match(pointRegistration.pointInputIssue({ ...ok, district: "" }), /Bairro/);
+  assert.match(pointRegistration.pointInputIssue({ ...ok, hours: "  " }), /Horário/);
+  assert.match(pointRegistration.pointInputIssue({ ...ok, capacity: "0" }), /Capacidade/);
+  assert.match(pointRegistration.pointInputIssue({ ...ok, capacity: "101" }), /Capacidade/);
+  assert.match(pointRegistration.pointInputIssue({ ...ok, capacity: "4a" }), /Capacidade/);
+  assert.equal(pointRegistration.cleanPointInput({ ...ok, name: "  Ponto   Um " }).name, "Ponto Um");
+  assert.equal(pointRegistration.pointGeocodeQuery({ address: " Rua das Flores,  100", district: "Centro" }), "Rua das Flores, 100, Centro, Brasil");
+});
+
+test("necessidades do doador: título, rótulo de interessados, filtro e situação do pedido", () => {
+  const needs = require(path.join(compiledRoot, "src/domain/needs.js"));
+  const lista = [
+    { id: "1", category: "camisa", size: "M", quantity: 2, district: "Centro", createdAt: "2026-11-19T10:00:00Z", interestedCount: 0, mine: false },
+    { id: "2", category: "calca", size: "38", quantity: 1, district: "Vila Oliveira", createdAt: "2026-11-19T11:00:00Z", interestedCount: 3, mine: true },
+  ];
+  assert.equal(needs.needTitle(lista[0]), "2× Camisa escolar — Tam. M");
+  assert.equal(needs.interestedLabel(lista[0]), "Sem interessados");
+  assert.equal(needs.interestedLabel({ interestedCount: 1, mine: false }), "1 interessado");
+  assert.equal(needs.interestedLabel({ interestedCount: 4, mine: false }), "4 interessados");
+  assert.equal(needs.interestedLabel(lista[1]), "Você quer ajudar");
+  assert.deepEqual(needs.filterNeeds(lista, "all", "").length, 2);
+  assert.deepEqual(needs.filterNeeds(lista, "calca", "").map((n) => n.id), ["2"]);
+  assert.deepEqual(needs.filterNeeds(lista, "all", "vila").map((n) => n.id), ["2"]);
+  assert.deepEqual(needs.filterNeeds(lista, "camisa", "38").length, 0);
+  assert.equal(needs.isNeedOpen("approved"), true);
+  assert.equal(needs.isNeedOpen("ready"), false);
+  assert.equal(needs.isNeedOpen("delivered"), false);
 });
