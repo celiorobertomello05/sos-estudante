@@ -207,3 +207,7 @@ export async function createCollectionPoint(input: {
     }),
   );
 }
+
+export async function expressInterest(needId: string) {
+  await unwrap(requireSupabase().rpc("express_interest", { p_need_id: needId }));
+}

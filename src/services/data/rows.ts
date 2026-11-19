@@ -178,3 +178,25 @@ export interface PendingCollectorRow {
   created_at: string;
   files: string[] | null;
 }
+
+export interface OpenNeedRow {
+  need_id: string;
+  category: ItemCategory;
+  size: string;
+  quantity: number;
+  district: string;
+  created_at: string;
+  interested_count: number;
+  mine: boolean;
+}
+
+export interface MyInterestRow {
+  interest_id: string;
+  need_id: string;
+  category: ItemCategory;
+  size: string;
+  quantity: number;
+  district: string;
+  status: RequestStatus;
+  created_at: string;
+}

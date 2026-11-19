@@ -1,10 +1,11 @@
 /** Leituras: tudo que o usuário logado pode ver (o RLS filtra no servidor). */
 import type { AppNotification, CollectionPoint, Delivery, Donation, Enrollment, EnrollmentSubmission, PendingReviews, Profile, StockItem, StockMovement, SupportRequest, SupportTicket, UserSettings } from "../../domain/models";
 import { findActiveEnrollment } from "../../domain/models";
+import type { MyInterest, OpenNeed } from "../../domain/needs";
 import { PICKUP_CODE_MAX_ATTEMPTS } from "../../domain/rules";
 import { requireSupabase } from "../../lib/supabase";
 import { signedUrl } from "../storageService";
-import type { ProfileRow, EnrollmentRow, CollectionPointRow, StockItemRow, DonationRow, RequestRow, DeliveryRow, StockMovementRow, NotificationRow, SettingsRow, TicketRow, PickupCodeRow, PendingEnrollmentRow, PendingCollectorRow } from "./rows";
+import type { ProfileRow, EnrollmentRow, CollectionPointRow, StockItemRow, DonationRow, RequestRow, DeliveryRow, StockMovementRow, NotificationRow, SettingsRow, TicketRow, PickupCodeRow, PendingEnrollmentRow, PendingCollectorRow, OpenNeedRow, MyInterestRow } from "./rows";
 import { PROFILE_COLUMNS, ENROLLMENT_COLUMNS, POINT_COLUMNS, STOCK_COLUMNS, DONATION_COLUMNS, REQUEST_COLUMNS, DELIVERY_COLUMNS, MOVEMENT_COLUMNS, NOTIFICATION_COLUMNS, TICKET_COLUMNS, SETTINGS_COLUMNS } from "./columns";
 import { toProfile, toEnrollment, toPoint, toStock, toDonation, toRequest, toMovement, toNotification, toSettings } from "./mappers";
 import { unwrap } from "./client";
@@ -178,6 +179,37 @@ export async function loadPendingReviews(): Promise<PendingReviews> {
       phone: r.phone ?? undefined,
       createdAt: r.created_at,
       files: r.files ?? [],
+    })),
+  };
+}
+
+/** Necessidades abertas (anônimas) e interesses do doador. As RPCs recusam quem não é doador ativo. */
+export async function loadNeeds(): Promise<{ needs: OpenNeed[]; interests: MyInterest[] }> {
+  const db = requireSupabase();
+  const [needs, interests] = await Promise.all([
+    unwrap<OpenNeedRow[]>(db.rpc("list_open_needs")),
+    unwrap<MyInterestRow[]>(db.rpc("list_my_interests")),
+  ]);
+  return {
+    needs: (needs ?? []).map((r) => ({
+      id: r.need_id,
+      category: r.category,
+      size: r.size,
+      quantity: r.quantity,
+      district: r.district,
+      createdAt: r.created_at,
+      interestedCount: r.interested_count,
+      mine: r.mine,
+    })),
+    interests: (interests ?? []).map((r) => ({
+      id: r.interest_id,
+      needId: r.need_id,
+      category: r.category,
+      size: r.size,
+      quantity: r.quantity,
+      district: r.district,
+      status: r.status,
+      createdAt: r.created_at,
     })),
   };
 }

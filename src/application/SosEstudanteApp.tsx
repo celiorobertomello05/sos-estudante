@@ -30,6 +30,7 @@ import { CompleteProfileScreen, ForgotPasswordScreen, LoginScreen, NewPasswordSc
 import { DeliveryScreen, DistributionScreen } from "../screens/delivery/DeliveryScreens";
 import { DonateScreen, DonationSuccessScreen, PointsScreen } from "../screens/donations/DonationScreens";
 import DashboardScreen from "../screens/home/DashboardScreen";
+import { NeedDetailScreen, NeedSuccessScreen, NeedsScreen } from "../screens/needs/NeedScreens";
 import { StockDetailScreen, StockScreen, TriageScreen } from "../screens/inventory/InventoryScreens";
 import { RequestDetailScreen, RequestScreen, RequestSuccessScreen, RequestsScreen } from "../screens/requests/RequestScreens";
 
@@ -69,6 +70,9 @@ const screens: Record<Route["name"], () => ReactNode> = {
   admin: AdminDashboardScreen,
   "admin-stock": AdminStockScreen,
   "point-new": PointFormScreen,
+  needs: NeedsScreen,
+  "need-detail": NeedDetailScreen,
+  "need-success": NeedSuccessScreen,
   "impact-map": ImpactMapScreen,
   reviews: ReviewsScreen,
 };

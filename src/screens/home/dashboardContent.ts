@@ -38,7 +38,7 @@ export const dashboardContent: Record<UserRole, (app: AppStore) => DashboardCont
     ],
     shortcuts: [
       { label: "Fazer doação", icon: "heart-outline", tone: "brand", route: { name: "donate" } },
-      { label: "Minha agenda", icon: "calendar-outline", tone: "trust", route: { name: "donate", tab: "agenda" } },
+      { label: "Necessidades", icon: "hand-left-outline", tone: "trust", route: { name: "needs" } },
       { label: "Impacto", icon: "analytics-outline", tone: "amber", route: { name: "impact-map" } },
     ],
   }),

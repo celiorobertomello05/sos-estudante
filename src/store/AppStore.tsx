@@ -25,6 +25,7 @@ import { useStoreCore } from "./core";
 import { createDonationActions } from "./donationActions";
 import { createRequestActions } from "./requestActions";
 import { createStockActions } from "./stockActions";
+import { createNeedActions } from "./needActions";
 import { createPointActions } from "./pointActions";
 import { createReviewActions } from "./reviewActions";
 import { createAccountActions } from "./accountActions";
@@ -154,6 +155,7 @@ function useAppStoreState() {
   const { createRequest, cancelRequest, regeneratePickupCode, advanceRequest, confirmDelivery } = createRequestActions(core);
   const { registerMovement } = createStockActions(core);
   const { createPoint } = createPointActions(core);
+  const { loadNeeds, expressInterest } = createNeedActions(core);
   const { loadReviews, reviewEnrollment, reviewCollector, openReviewDocument } = createReviewActions(core);
   const { openTicket, markAllRead, updateSettings, updateProfile, saveEnrollment } = createAccountActions(core);
   const { requestUserLocation, locateSearchOrigin, canUseOrigin } = createLocationActions(core);
@@ -201,6 +203,8 @@ function useAppStoreState() {
     confirmDelivery,
     registerMovement,
     createPoint,
+    loadNeeds,
+    expressInterest,
     openTicket,
     markAllRead,
     updateSettings,

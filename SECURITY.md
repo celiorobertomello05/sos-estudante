@@ -46,6 +46,12 @@ quem mantém o projeto.
   restrita a coletor com conta ativa, com validação de tamanhos, capacidade,
   coordenadas e duplicidade no servidor, e registro em `audit_logs`. Não há
   INSERT direto na tabela; o aplicativo só lê.
+- Necessidades e interesse do doador (US05): `need_interests` tem RLS e nenhuma
+  policy nem GRANT; o acesso é só pelas RPCs `list_open_needs`,
+  `express_interest` e `list_my_interests`, restritas a doador com conta ativa.
+  A lista é anônima (categoria, tamanho, quantidade e bairro; nunca nome, escola
+  ou documento), o interesse é único por doador e necessidade, limitado a 20
+  ativos, e o estudante é avisado sem identificação do doador.
 - Perfil: o usuário só altera nome, telefone, CEP, endereço e foto (permissão
   por coluna). Papel e CPF/RG são definidos uma única vez por RPC.
 - Ações sensíveis registradas em `audit_logs` (sem acesso pelo cliente).

@@ -17,7 +17,8 @@ uniformes e materiais escolares"**, apresentado no **4º Summit UMC**
 - **Estudante:** valida a matrícula (com CadÚnico), solicita itens e acompanha o
   pedido até a retirada com um código de 4 dígitos.
 - **Doador:** registra doações e agenda a entrega em pontos de coleta próximos
-  (mapa e localização).
+  (mapa e localização); vê as necessidades abertas, de forma anônima, e
+  demonstra interesse em ajudar (US05).
 - **Equipe:** triagem de doações, controle de estoque, aprovação de pedidos,
   validação de matrículas e coletores, cadastro de pontos de coleta e entrega
   com foto e assinatura.

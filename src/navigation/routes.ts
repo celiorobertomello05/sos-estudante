@@ -35,6 +35,9 @@ export type Route =
   | { name: "admin" }
   | { name: "admin-stock" }
   | { name: "point-new" }
+  | { name: "needs" }
+  | { name: "need-detail"; id: string }
+  | { name: "need-success"; id: string }
   | { name: "reviews" }
   | { name: "impact-map" };
 
@@ -56,6 +59,9 @@ export const routeRoles: Partial<Record<RouteName, UserRole[]>> = {
   admin: ["collector"],
   "admin-stock": ["collector"],
   "point-new": ["collector"],
+  needs: ["donor"],
+  "need-detail": ["donor"],
+  "need-success": ["donor"],
   reviews: ["collector"],
   "impact-map": ["collector", "donor"],
   "request-detail": ["student", "collector"],
@@ -77,6 +83,9 @@ export const operationalRoutes: RouteName[] = [
   "admin",
   "admin-stock",
   "point-new",
+  "needs",
+  "need-detail",
+  "need-success",
   "reviews",
 ];
 

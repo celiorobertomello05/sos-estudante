@@ -18,6 +18,7 @@ const faq = [
   { q: "Meu código de retirada foi bloqueado. E agora?", a: "O código é bloqueado após 5 tentativas erradas. Abra o pedido e gere um código novo; as tentativas voltam a zero. Só você, dono do pedido, pode gerar outro." },
   { q: "Posso cancelar um pedido?", a: "Sim, enquanto ele estiver em análise, aprovado ou em separação. Depois de pronto para retirada, fale com o atendimento." },
   { q: "Como faço uma doação?", a: "Em Doar, escolha categoria, tamanho, quantidade e conservação, selecione o ponto parceiro e o horário. A entrega é feita por você no ponto." },
+  { q: "Como ajudo uma necessidade de um estudante?", a: "Em Necessidades, veja os pedidos abertos de forma anônima (item, tamanho, quantidade e bairro), toque em um deles e escolha Demonstrar interesse. O estudante é avisado sem saber quem você é. Depois, faça a doação normalmente em Doar." },
   { q: "O que acontece na triagem?", a: "A equipe confere estado, higienização e tamanho. Itens aprovados vão para o estoque; recusados recebem uma observação explicando o motivo." },
   { q: "Como encontro o ponto mais perto?", a: "Em Locais de retirada, escolha “onde estou”, “casa” ou “escola” e defina o raio de 2 a 20 km. Toque no mapa para ampliá-lo." },
   { q: "Esqueci minha senha", a: "Na tela de login, toque em “Esqueci minha senha” e siga o link enviado ao seu e-mail." },

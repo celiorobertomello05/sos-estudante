@@ -37,7 +37,7 @@ const tabsByRole: Record<UserRole, Tab[]> = {
   donor: [
     home,
     points,
-    { route: { name: "donate" }, label: "Doar", icon: "shirt-outline", match: ["donate"] },
+    { route: { name: "donate" }, label: "Doar", icon: "shirt-outline", match: ["donate", "needs", "need-detail", "need-success"] },
     { route: { name: "donate", tab: "agenda" }, label: "Doações", icon: "cube-outline", match: [] },
     profile,
   ],
