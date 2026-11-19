@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
-import { BackHandler } from "react-native";
+import { BackHandler, Keyboard } from "react-native";
 import type { Route } from "./routes";
 
 interface NavigationApi {
@@ -24,6 +24,11 @@ export function NavigationProvider({ initial, children }: { initial: Route; chil
   const replace = useCallback((route: Route) => setStack((current) => [...current.slice(0, -1), route]), []);
   const reset = useCallback((route: Route) => setStack([route]), []);
   const back = useCallback(() => setStack((current) => (current.length > 1 ? current.slice(0, -1) : current)), []);
+
+  // Ao trocar de tela, o teclado aberto da tela anterior recolhe sozinho.
+  useEffect(() => {
+    Keyboard.dismiss();
+  }, [stack]);
 
   // Botão voltar do Android: volta uma tela; na raiz, deixa o sistema fechar o app.
   useEffect(() => {

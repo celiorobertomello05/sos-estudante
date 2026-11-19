@@ -97,6 +97,7 @@ export function ProfileScreen() {
           Minha conta
         </Txt>
         <ListRow flat icon="person-outline" onPress={() => go({ name: "personal-data" })} title="Dados pessoais" />
+        <ListRow flat icon="calendar-outline" onPress={() => go({ name: "agenda" })} title="Calendário" />
         <ListRow flat icon="time-outline" onPress={() => go({ name: "history" })} title="Histórico de atividades" />
         <ListRow flat icon="document-attach-outline" onPress={() => go({ name: "documents" })} title="Meus documentos" />
         {role === "student" ? <ListRow flat icon="school-outline" onPress={() => go({ name: "enrollment" })} title="Escola e matrícula" /> : null}

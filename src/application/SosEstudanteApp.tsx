@@ -16,6 +16,7 @@ import { AdminDashboardScreen, AdminStockScreen, ImpactMapScreen, PointFormScree
 import { ReviewsScreen } from "../screens/admin/ReviewScreens";
 import {
   AboutScreen,
+  AgendaScreen,
   AccountDocumentsScreen,
   EnrollmentScreen,
   HelpScreen,
@@ -58,6 +59,7 @@ const screens: Record<Route["name"], () => ReactNode> = {
   distribution: DistributionScreen,
   delivery: DeliveryScreen,
   history: HistoryScreen,
+  agenda: AgendaScreen,
   notifications: NotificationsScreen,
   profile: ProfileScreen,
   "personal-data": PersonalDataScreen,

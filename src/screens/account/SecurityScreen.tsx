@@ -62,8 +62,8 @@ export function SecurityScreen() {
       </Card>
       <Card>
         <Txt variant="h2">Alterar senha</Txt>
-        <Field label="Nova senha" onChangeText={(v) => (setPassword(v), setError(null))} secure value={password} />
-        <Field error={error} label="Confirme a nova senha" onChangeText={(v) => (setConfirm(v), setError(null))} secure value={confirm} />
+        <Field autoComplete="new-password" label="Nova senha" textContentType="newPassword" onChangeText={(v) => (setPassword(v), setError(null))} secure value={password} />
+        <Field autoComplete="new-password" error={error} label="Confirme a nova senha" textContentType="newPassword" onChangeText={(v) => (setConfirm(v), setError(null))} secure value={confirm} />
         <Button label="Atualizar senha" loading={loading} onPress={change} />
       </Card>
       <Button icon="trash-outline" label="Solicitar exclusão da conta" onPress={requestDeletion} variant="ghost" />

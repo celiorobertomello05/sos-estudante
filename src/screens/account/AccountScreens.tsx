@@ -1,4 +1,5 @@
 /** Índice das telas de Account (um arquivo por tela). */
+export { AgendaScreen } from "./AgendaScreen";
 export { HistoryScreen } from "./HistoryScreen";
 export { NotificationsScreen } from "./NotificationsScreen";
 export { ProfileScreen } from "./ProfileScreen";
