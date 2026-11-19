@@ -23,6 +23,7 @@ export type Route =
   | { name: "distribution" }
   | { name: "delivery"; id: string }
   | { name: "history" }
+  | { name: "agenda" }
   | { name: "notifications" }
   | { name: "profile" }
   | { name: "personal-data" }

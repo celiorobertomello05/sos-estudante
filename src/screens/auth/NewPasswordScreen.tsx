@@ -30,8 +30,8 @@ export function NewPasswordScreen() {
   return (
     <Screen title="Criar nova senha">
       <Txt>Escolha uma nova senha para a sua conta.</Txt>
-      <Field label="Nova senha" onChangeText={(v) => (setPassword(v), setError(null))} secure value={password} />
-      <Field error={error} label="Confirmar nova senha" onChangeText={(v) => (setConfirm(v), setError(null))} secure value={confirm} />
+      <Field autoComplete="new-password" label="Nova senha" textContentType="newPassword" onChangeText={(v) => (setPassword(v), setError(null))} secure value={password} />
+      <Field autoComplete="new-password" error={error} label="Confirmar nova senha" textContentType="newPassword" onChangeText={(v) => (setConfirm(v), setError(null))} secure value={confirm} />
       <Button label="Salvar nova senha" loading={loading} onPress={submit} />
     </Screen>
   );

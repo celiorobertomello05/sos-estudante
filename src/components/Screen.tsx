@@ -10,6 +10,7 @@ import { backTarget } from "../navigation/routes";
 import { useApp } from "../store/AppStore";
 import { CONTENT_MAX_WIDTH, colors, spacing } from "../theme";
 import BottomNav from "./BottomNav";
+import { FocusChainProvider } from "./ui/FocusChain";
 import { Txt } from "./ui";
 
 /**
@@ -75,6 +76,7 @@ export default function Screen({
       {scroll ? (
         <ScrollView
           contentContainerStyle={{ paddingBottom: spacing.xxl, paddingTop: hero ? 0 : (title === undefined ? insets.top : 0) + (padded ? spacing.lg : 0) }}
+          keyboardDismissMode={Platform.OS === "ios" ? "interactive" : "on-drag"}
           keyboardShouldPersistTaps="handled"
           refreshControl={
             app.mode === "online" ? (
@@ -92,12 +94,12 @@ export default function Screen({
           style={styles.root}
         >
           {hero}
-          {body}
+          <FocusChainProvider>{body}</FocusChainProvider>
         </ScrollView>
       ) : (
         <View style={[styles.root, !hero && { paddingTop: (title === undefined ? insets.top : 0) + (padded ? spacing.lg : 0) }]}>
           {hero}
-          {body}
+          <FocusChainProvider>{body}</FocusChainProvider>
         </View>
       )}
       {footer ? <View style={[styles.footer, !tabs && { paddingBottom: insets.bottom + spacing.lg }]}><View style={[styles.content, { gap: spacing.sm }]}>{footer}</View></View> : null}

@@ -22,7 +22,7 @@ const profile: Tab = {
   route: { name: "profile" },
   label: "Perfil",
   icon: "person-outline",
-  match: ["profile", "personal-data", "enrollment", "settings", "security", "help", "about", "history"],
+  match: ["profile", "personal-data", "enrollment", "settings", "security", "help", "about", "history", "agenda"],
 };
 
 /** Mesma estrutura do protótipo: Início · Pontos · ação central · Pedidos · Perfil. */
