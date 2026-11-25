@@ -91,6 +91,20 @@ flag, o app mostra um erro de configuração em vez de entrar na demonstração.
 O login Google precisa do app instalado (build de desenvolvimento), porque o
 retorno usa o esquema `sosestudante://`.
 
+## Rodar no celular (equipe)
+
+1. Instale Node 22+ e pnpm 10.34.3; clone o repositório e rode `pnpm install`.
+2. Crie o arquivo `.env.local` na raiz com `EXPO_PUBLIC_SUPABASE_URL` e
+   `EXPO_PUBLIC_SUPABASE_ANON_KEY` (os valores são passados pelo PO, fora do Git).
+3. No celular Android, instale o APK de desenvolvimento (link enviado pelo PO).
+4. Celular e computador na mesma rede Wi-Fi. Rode
+   `pnpm expo start --dev-client --clear` e, no app, toque em
+   "Enter URL manually" e digite `http://<IP do computador>:8081`.
+
+Se o app mostrar "Sem conexão" com internet funcionando, confira o endereço do
+banco no log do terminal: variáveis `EXPO_PUBLIC_*` definidas no Windows vencem
+o `.env.local`. Apague-as (ou atualize) e abra um terminal novo.
+
 ## Build (EAS)
 
 `eas.json` tem três perfis: `development` (dev client, com demonstração),

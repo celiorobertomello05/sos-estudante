@@ -61,9 +61,11 @@ export function PointsScreen() {
   return (
     <Screen tabs title="Locais de retirada">
       {app.role === "collector" ? <Button icon="add-circle-outline" label="Cadastrar ponto de coleta" onPress={() => go({ name: "point-new" })} variant="ghost" /> : null}
-      {app.points.length ? (
-        <PointsMap caption={`${app.points.length} pontos de coleta ativos`} points={app.points} userLocation={coords ?? undefined} />
-      ) : null}
+      <PointsMap
+        caption={app.points.length ? `${app.points.length} pontos de coleta ativos` : undefined}
+        points={app.points}
+        userLocation={coords ?? undefined}
+      />
       {isWeb ? (
         <Notice body="A busca por distância (onde estou, casa ou escola) funciona no aplicativo Android e iOS." title="Visualização web" />
       ) : (
