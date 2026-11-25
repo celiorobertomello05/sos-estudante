@@ -21,6 +21,7 @@ export { Timeline } from "./Timeline";
 export { EmptyState } from "./EmptyState";
 export { Notice } from "./Notice";
 export { Field } from "./Field";
+export { FocusChainProvider } from "./FocusChain";
 export { Chips } from "./Chips";
 export { Tabs } from "./Tabs";
 export { Stepper } from "./Stepper";

@@ -147,7 +147,7 @@ export function RegisterScreen() {
               value={donorKind}
             />
           ) : null}
-          <Field error={errors.fullName} label={isCompany ? "Razão social" : "Nome completo"} onChangeText={set("fullName")} placeholder={isCompany ? "Papelaria Avenida Ltda." : "Ana Carolina Santos"} required value={form.fullName} />
+          <Field autoCapitalize="words" autoComplete="name" textContentType="name" error={errors.fullName} label={isCompany ? "Razão social" : "Nome completo"} onChangeText={set("fullName")} placeholder={isCompany ? "Papelaria Avenida Ltda." : "Ana Carolina Santos"} required value={form.fullName} />
           <Field
             error={errors.document}
             keyboardType="number-pad"
@@ -163,7 +163,7 @@ export function RegisterScreen() {
           {role === "student" ? (
             <Field error={errors.birthDate} keyboardType="number-pad" label="Data de nascimento" onChangeText={(v) => set("birthDate")(maskDate(v))} placeholder="DD/MM/AAAA" required value={form.birthDate} />
           ) : null}
-          <Field error={errors.phone} keyboardType="phone-pad" label="Telefone" onChangeText={(v) => set("phone")(maskPhoneInput(v))} placeholder="(11) 90000-0000" required value={form.phone} />
+          <Field autoComplete="tel" textContentType="telephoneNumber" error={errors.phone} keyboardType="phone-pad" label="Telefone" onChangeText={(v) => set("phone")(maskPhoneInput(v))} placeholder="(11) 90000-0000" required value={form.phone} />
         </>
       ) : null}
 
@@ -172,8 +172,8 @@ export function RegisterScreen() {
           <Field error={errors.postalCode} keyboardType="number-pad" label="CEP" onChangeText={(v) => set("postalCode")(maskCep(v))} placeholder="00000-000" required value={form.postalCode} />
           <Field error={errors.address} label="Endereço" onChangeText={set("address")} placeholder="Rua, número e bairro" required value={form.address} />
           <Field autoCapitalize="none" error={errors.email} keyboardType="email-address" label="E-mail" onChangeText={set("email")} placeholder="seuemail@exemplo.com" required value={form.email} />
-          <Field error={errors.password} hint="Mínimo de 8 caracteres, com maiúscula, minúscula e número." label="Crie uma senha" onChangeText={set("password")} required secure value={form.password} />
-          <Field error={errors.confirm} label="Confirme a senha" onChangeText={set("confirm")} required secure value={form.confirm} />
+          <Field autoComplete="new-password" error={errors.password} textContentType="newPassword" hint="Mínimo de 8 caracteres, com maiúscula, minúscula e número." label="Crie uma senha" onChangeText={set("password")} required secure value={form.password} />
+          <Field autoComplete="new-password" error={errors.confirm} textContentType="newPassword" label="Confirme a senha" onChangeText={set("confirm")} required secure value={form.confirm} />
         </>
       ) : null}
 

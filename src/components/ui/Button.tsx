@@ -1,4 +1,4 @@
-import { ActivityIndicator, Pressable } from "react-native";
+import { ActivityIndicator, Keyboard, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "../../theme";
 import type { Tone } from "../../theme";
@@ -30,7 +30,11 @@ export function Button({
       accessibilityRole="button"
       accessibilityState={{ disabled: disabled || loading }}
       disabled={disabled || loading}
-      onPress={onPress}
+      onPress={() => {
+        // Quem toca em um botão não precisa fechar o teclado antes.
+        Keyboard.dismiss();
+        onPress();
+      }}
       style={({ pressed }) => [
         s.button,
         variant === "primary" && { backgroundColor: fill },

@@ -1,7 +1,5 @@
 import type { ExpoConfig } from "expo/config";
 
-const googleMapsAndroidApiKey = process.env.GOOGLE_MAPS_ANDROID_API_KEY?.trim();
-
 const config: ExpoConfig = {
   name: "SOS Estudante",
   slug: "sos-estudante",
@@ -54,15 +52,6 @@ const config: ExpoConfig = {
       foregroundImage: "./assets/icons/adaptive-icon.png",
       backgroundColor: "#ffffff",
     },
-    ...(googleMapsAndroidApiKey
-      ? {
-          config: {
-            googleMaps: {
-              apiKey: googleMapsAndroidApiKey,
-            },
-          },
-        }
-      : {}),
   },
   androidNavigationBar: {
     backgroundColor: "#ffffff",

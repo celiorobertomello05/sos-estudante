@@ -16,6 +16,7 @@ const pureModules = [
   "src/domain/pointSearch.ts",
   "src/domain/pointRegistration.ts",
   "src/domain/needs.ts",
+  "src/domain/agenda.ts",
   "src/domain/models.ts",
   "src/domain/rules.ts",
   "src/domain/requestRules.ts",
@@ -1232,4 +1233,29 @@ test("necessidades do doador: título, rótulo de interessados, filtro e situaç
   assert.equal(needs.isNeedOpen("approved"), true);
   assert.equal(needs.isNeedOpen("ready"), false);
   assert.equal(needs.isNeedOpen("delivered"), false);
+});
+
+test("calendário: cada perfil vê as próprias datas, próximas antes das anteriores", () => {
+  const agenda = require(path.join(compiledRoot, "src/domain/agenda.js"));
+  const agora = new Date("2026-11-20T12:00:00Z");
+  const points = [{ id: "p1", name: "Ponto Centro" }];
+  const requests = [
+    { id: "r1", status: "approved", pointId: "p1", pickupAt: "2026-11-25T10:00:00Z", items: [{ category: "camisa", quantityRequested: 2 }, { category: "kit", quantityRequested: 1 }] },
+    { id: "r2", status: "delivered", pointId: "p1", pickupAt: "2026-11-10T10:00:00Z", items: [{ category: "calca", quantityRequested: 1 }] },
+    { id: "r3", status: "cancelled", pointId: "p1", pickupAt: "2026-11-26T10:00:00Z", items: [{ category: "kit", quantityRequested: 1 }] },
+  ];
+  const donations = [
+    { id: "d1", status: "scheduled", pointId: "p1", scheduledFor: "2026-11-22T09:00:00Z", quantity: 3, category: "agasalho", donorName: "Ana Souza" },
+    { id: "d2", status: "rejected", pointId: "p1", scheduledFor: "2026-11-23T09:00:00Z", quantity: 1, category: "camisa", donorName: "Ana Souza" },
+    { id: "d3", status: "stocked", pointId: "p1", scheduledFor: "2026-11-05T09:00:00Z", quantity: 2, category: "shorts", donorName: "Ana Souza" },
+  ];
+  const aluno = agenda.buildAgenda("student", { requests, donations, points }, agora);
+  assert.deepEqual(aluno.map((e) => [e.id, e.past]), [["r-r1", false], ["r-r2", true]]);
+  assert.equal(aluno[0].title, "Retirada: 2× Camisa escolar e mais 1");
+  assert.equal(aluno[0].detail, "Ponto Centro");
+  const doador = agenda.buildAgenda("donor", { requests, donations, points }, agora);
+  assert.deepEqual(doador.map((e) => [e.id, e.past]), [["d-d1", false], ["d-d3", true]]);
+  const equipe = agenda.buildAgenda("collector", { requests, donations, points }, agora);
+  assert.deepEqual(equipe.filter((e) => !e.past).map((e) => e.id), ["d-d1", "r-r1"]);
+  assert.equal(equipe[0].title, "Entrega de Ana: 3× Agasalho");
 });
